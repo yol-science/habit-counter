@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>習慣カウンター</title>
+</head>
+<body>
+
+<h1>習慣カウンター</h1>
+
+<button onclick="add('exercise')">運動</button>
+<button onclick="add('study')">勉強</button>
+<button onclick="add('meditation')">瞑想</button>
+
+<h2>今日</h2>
+<pre id="today"></pre>
+
+<h2>累計</h2>
+<pre id="total"></pre>
+
+<script>
+function add(activity){
+  fetch("/api/add",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({activity})
+  }).then(()=>refresh())
+}
+
+function refresh(){
+  fetch("/api/today")
+    .then(r=>r.json())
+    .then(d=>today.textContent=JSON.stringify(d,null,2))
+
+  fetch("/api/total")
+    .then(r=>r.json())
+    .then(d=>total.textContent=JSON.stringify(d,null,2)) 
+}
+
+refresh()
+</script>
+
+</body>
+</html>
