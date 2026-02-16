@@ -3,42 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <title>習慣カウンター</title>
-<style>
-body{
-  font-family: Arial, sans-serif;
-  text-align: center;
-  background-color: #f5f7fa;
-}
-
-button{
-  padding: 12px 20px;
-  margin: 8px;
-  font-size: 16px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  background-color: #4CAF50;
-  color: white;
-}
-
-button:hover{
-  background-color: #45a049;
-}
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
 
-<h1>ライフ式 習慣カウンター</h1>
+<div class="container">
+  <h1>ライフ式 習慣カウンター</h1>
 
-<div id="buttons">
-  <button onclick="add('exercise')">運動</button>
-  <button onclick="add('study')">勉強</button>
-  <button onclick="add('meditation')">瞑想</button>
+  <div class="button-group">
+    <button onclick="add('exercise')">運動</button>
+    <button onclick="add('study')">勉強</button>
+    <button onclick="add('meditation')">瞑想</button>
+  </div>
+
+  <div id="status" class="card-area"></div>
 </div>
-
-<hr>
-
-<div id="status"></div>
 
 <script>
 function heart(life){
@@ -57,22 +37,22 @@ function refresh(){
   fetch("/api/today")
     .then(r=>r.json())
     .then(data=>{
-      const order = ["exercise", "study", "meditation"]
-
+      const order = ["exercise","study","meditation"]
       let output=""
 
       order.forEach(key=>{
         if(data[key]){
           output += `
-${key}
-${heart(data[key].life)}
-累計: ${data[key].total}
-
-`
+          <div class="card">
+            <h2>${key}</h2>
+            <div class="life">${heart(data[key].life)}</div>
+            <div class="total">累計: ${data[key].total}</div>
+          </div>
+          `
         }
       })
 
-      document.getElementById("status").textContent=output
+      document.getElementById("status").innerHTML = output
     })
 }
 
