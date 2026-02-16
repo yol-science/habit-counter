@@ -23,14 +23,6 @@ def init_db():
         )
     """)
 
-    habits = ["exercise", "study", "meditation"]
-
-    for habit in habits:
-        c.execute("""
-            INSERT OR IGNORE INTO habits
-            (name, life, total_count, last_record_date)
-            VALUES (?, 3, 0, NULL)
-        """, (habit,))
 
     conn.commit()
     conn.close()
@@ -83,6 +75,43 @@ def update_life(habit):
 @app.route("/")
 def index():
     return render_template("index.html")
+
+#タスク追加API
+@app.route("/api/add_habit", methods=["POST"])
+def add_habit():
+    name = request.json.get("name")
+
+    if not name:
+        return jsonify({"error": "Name required"}), 400
+
+    conn = sqlite3.connect(DB_NAME)
+    c = conn.cursor()
+
+    try:
+        c.execute("""
+            INSERT INTO habits (name, life, total_count, last_record_date)
+            VALUES (?, 3, 0, NULL)
+        """, (name,))
+        conn.commit()
+    except sqlite3.IntegrityError:
+        conn.close()
+        return jsonify({"error": "Habit already exists"}), 400
+
+    conn.close()
+    return jsonify({"message": "Habit added"})
+
+#タスク削除API
+@app.route("/api/delete_habit", methods=["POST"])
+def delete_habit():
+    name = request.json.get("name")
+
+    conn = sqlite3.connect(DB_NAME)
+    c = conn.cursor()
+    c.execute("DELETE FROM habits WHERE name=?", (name,))
+    conn.commit()
+    conn.close()
+
+    return jsonify({"message": "Habit deleted"})
 
 # --------------------
 # カウント追加API　実際の操作部分

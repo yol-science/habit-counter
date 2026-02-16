@@ -11,11 +11,10 @@
 <div class="container">
   <h1>ライフ式 習慣カウンター</h1>
 
-  <div class="button-group">
-    <button onclick="add('exercise')">運動</button>
-    <button onclick="add('study')">勉強</button>
-    <button onclick="add('meditation')">瞑想</button>
-  </div>
+<div class="add-area">
+  <input type="text" id="newHabit" placeholder="新しい習慣を追加">
+  <button onclick="addHabit()">追加</button>
+</div>
 
   <div id="status" class="card-area"></div>
 </div>
@@ -33,24 +32,51 @@ function add(activity){
   }).then(()=>refresh())
 }
 
+function addHabit(){
+  const name = document.getElementById("newHabit").value
+  if(!name) return
+
+  fetch("/api/add_habit",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({name})
+  }).then(()=>{
+    document.getElementById("newHabit").value=""
+    refresh()
+  })
+}
+
+function deleteHabit(name){
+  fetch("/api/delete_habit",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({name})
+  }).then(refresh)
+}
+
 function refresh(){
   fetch("/api/today")
     .then(r=>r.json())
     .then(data=>{
-      const order = ["exercise","study","meditation"]
       let output=""
 
-      order.forEach(key=>{
-        if(data[key]){
+      if(Object.keys(data).length === 0){
+        output = "<p>まだ習慣がありません 🌱</p>"
+      } else {
+
+        for(let key in data){
           output += `
           <div class="card">
             <h2>${key}</h2>
             <div class="life">${heart(data[key].life)}</div>
             <div class="total">累計: ${data[key].total}</div>
+            <button onclick="add('${key}')">+1</button>
+            <button onclick="deleteHabit('${key}')">削除</button>
           </div>
           `
         }
-      })
+
+      }
 
       document.getElementById("status").innerHTML = output
     })
