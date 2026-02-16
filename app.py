@@ -38,7 +38,7 @@ def init_db():
 init_db()
 
 # ======================
-# 🧠 ライフ更新ロジック
+# 🧠 ライフ更新ロジック　（最重要）
 # ======================
 
 def update_life(habit):
@@ -85,7 +85,7 @@ def index():
     return render_template("index.html")
 
 # --------------------
-# カウント追加API
+# カウント追加API　実際の操作部分
 # --------------------
 @app.route("/api/add", methods=["POST"])
 def add_count():
@@ -118,8 +118,13 @@ def add_count():
         return jsonify({"message": "Life is zero. Reset required.", "life": life, "total": total_count})
 
     # カウント実行
+    previous_total = total_count
     total_count += 1
-    life = 3
+
+    # 10の倍数をまたいだらライフ+1（最大3）
+    if previous_total // 10 < total_count // 10:
+        if life < 3:
+            life += 1
 
     c.execute("""
         UPDATE habits

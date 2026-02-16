@@ -3,22 +3,48 @@
 <head>
 <meta charset="UTF-8">
 <title>習慣カウンター</title>
+<style>
+body{
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-color: #f5f7fa;
+}
+
+button{
+  padding: 12px 20px;
+  margin: 8px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background-color: #4CAF50;
+  color: white;
+}
+
+button:hover{
+  background-color: #45a049;
+}
+</style>
 </head>
 <body>
 
-<h1>習慣カウンター</h1>
+<h1>ライフ式 習慣カウンター</h1>
 
-<button onclick="add('exercise')">運動</button>
-<button onclick="add('study')">勉強</button>
-<button onclick="add('meditation')">瞑想</button>
+<div id="buttons">
+  <button onclick="add('exercise')">運動</button>
+  <button onclick="add('study')">勉強</button>
+  <button onclick="add('meditation')">瞑想</button>
+</div>
 
-<h2>今日</h2>
-<pre id="today"></pre>
+<hr>
 
-<h2>累計</h2>
-<pre id="total"></pre>
+<div id="status"></div>
 
 <script>
+function heart(life){
+  return "❤️".repeat(life) + "🖤".repeat(3-life)
+}
+
 function add(activity){
   fetch("/api/add",{
     method:"POST",
@@ -30,11 +56,24 @@ function add(activity){
 function refresh(){
   fetch("/api/today")
     .then(r=>r.json())
-    .then(d=>today.textContent=JSON.stringify(d,null,2))
+    .then(data=>{
+      const order = ["exercise", "study", "meditation"]
 
-  fetch("/api/total")
-    .then(r=>r.json())
-    .then(d=>total.textContent=JSON.stringify(d,null,2)) 
+      let output=""
+
+      order.forEach(key=>{
+        if(data[key]){
+          output += `
+${key}
+${heart(data[key].life)}
+累計: ${data[key].total}
+
+`
+        }
+      })
+
+      document.getElementById("status").textContent=output
+    })
 }
 
 refresh()
