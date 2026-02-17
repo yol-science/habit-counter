@@ -11,10 +11,16 @@
 <div class="container">
   <h1>ライフ式 習慣カウンター</h1>
 
-<div class="add-area">
-  <input type="text" id="newHabit" placeholder="新しい習慣を追加">
-  <button onclick="addHabit()">追加</button>
-</div>
+  <!-- 🔐 ここに移動 -->
+  <div class="host-area">
+    <input type="password" id="hostPassword" placeholder="ホストパスワード">
+    <button onclick="hostLogin()">ホストログイン</button>
+  </div>
+
+  <div class="add-area">
+    <input type="text" id="newHabit" placeholder="新しい習慣を追加">
+    <button onclick="addHabit()">追加</button>
+  </div>
 
   <div id="status" class="card-area"></div>
 </div>
@@ -72,14 +78,59 @@ function refresh(){
             <div class="total">累計: ${data[key].total}</div>
             <button onclick="add('${key}')">+1</button>
             <button onclick="deleteHabit('${key}')">削除</button>
-          </div>
           `
+
+          // 🔐 ホストモードのときだけ表示
+          if(isHost){
+            output += `
+              <div class="host-edit">
+                Life: <input type="number" id="life-${key}" value="${data[key].life}">
+                Total: <input type="number" id="total-${key}" value="${data[key].total}">
+                <button onclick="hostUpdate('${key}')">更新</button>
+              </div>
+            `
+          }
+
+          output += `</div>`
         }
 
       }
 
       document.getElementById("status").innerHTML = output
     })
+}
+
+let isHost = false;
+
+function hostLogin(){
+  const password = document.getElementById("hostPassword").value
+
+  fetch("/api/host_login",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({password})
+  })
+  .then(r=>r.json())
+  .then(data=>{
+    if(data.message){
+      isHost = true
+      alert("ホストモードON")
+      refresh()
+    } else {
+      alert("パスワードが違います")
+    }
+  })
+}
+
+function hostUpdate(name){
+  const life = document.getElementById(`life-${name}`).value
+  const total = document.getElementById(`total-${name}`).value
+
+  fetch("/api/host_update",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({name, life, total})
+  }).then(refresh)
 }
 
 refresh()

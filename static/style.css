@@ -64,3 +64,17 @@ h1{
   font-weight:bold;
   color:#2e7d32;
 }
+
+.host-area{
+  margin: 20px 0;
+}
+
+.host-area input{
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.host-area button{
+  padding: 8px 14px;
+}

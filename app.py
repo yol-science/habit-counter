@@ -1,9 +1,10 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, session
 import sqlite3
 from datetime import date
 from datetime import datetime
 
 app = Flask(__name__)
+app.secret_key = "super_secret_key"   # ← ここに入れる
 DB_NAME = "counter.db"
 
 # --------------------
@@ -201,6 +202,41 @@ def total():
 
     conn.close()
     return jsonify(result)
+
+#ホストログインAPI
+@app.route("/api/host_login", methods=["POST"])
+def host_login():
+    password = request.json.get("password")
+
+    if password == "admin123":
+        session["host"] = True
+        return jsonify({"message": "Host mode enabled"})
+    else:
+        return jsonify({"error": "Wrong password"}), 401
+    
+#ホスト更新API
+@app.route("/api/host_update", methods=["POST"])
+def host_update():
+    if not session.get("host"):
+        return jsonify({"error": "Unauthorized"}), 403
+
+    name = request.json.get("name")
+    life = int(request.json.get("life"))
+    total = int(request.json.get("total"))
+
+    conn = sqlite3.connect(DB_NAME)
+    c = conn.cursor()
+
+    c.execute("""
+        UPDATE habits
+        SET life=?, total_count=?
+        WHERE name=?
+    """, (life, total, name))
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({"message": "Updated"})
 # --------------------
 if __name__ == "__main__":
     app.run(debug=True)
