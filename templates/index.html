@@ -11,13 +11,15 @@
 <div class="container">
   <h1>ライフ式 習慣カウンター</h1>
 
-  <!-- 🔐 ここに移動 -->
-  <div class="host-area">
-    <input type="password" id="hostPassword" placeholder="ホストパスワード">
-    <button onclick="hostLogin()">ホストログイン</button>
+  <!-- 🔐 小さめホスト -->
+  <div class="host-mini">
+    <input type="password" id="hostPassword" placeholder="ホスト">
+    <button onclick="hostLogin()">ログイン</button>
   </div>
 
-  <div class="add-area">
+  <!-- 🌱 追加もカード化 -->
+  <div class="card add-card">
+    <h3>🌱 習慣を追加</h3>
     <input type="text" id="newHabit" placeholder="新しい習慣を追加">
     <button onclick="addHabit()">追加</button>
   </div>
@@ -66,33 +68,32 @@ function refresh(){
     .then(data=>{
       let output=""
 
-      if(Object.keys(data).length === 0){
+      if(data.length === 0){
         output = "<p>まだ習慣がありません 🌱</p>"
       } else {
 
-        for(let key in data){
+        data.forEach(item=>{
           output += `
           <div class="card">
-            <h2>${key}</h2>
-            <div class="life">${heart(data[key].life)}</div>
-            <div class="total">累計: ${data[key].total}</div>
-            <button onclick="add('${key}')">+1</button>
-            <button onclick="deleteHabit('${key}')">削除</button>
+            <h2>${item.name}</h2>
+            <div class="life">${heart(item.life)}</div>
+            <div class="total">累計: ${item.total}</div>
+            <button onclick="add('${item.name}')">+1</button>
+            <button onclick="deleteHabit('${item.name}')">削除</button>
           `
 
-          // 🔐 ホストモードのときだけ表示
           if(isHost){
             output += `
               <div class="host-edit">
-                Life: <input type="number" id="life-${key}" value="${data[key].life}">
-                Total: <input type="number" id="total-${key}" value="${data[key].total}">
-                <button onclick="hostUpdate('${key}')">更新</button>
+                Life: <input type="number" id="life-${item.name}" value="${item.life}">
+                Total: <input type="number" id="total-${item.name}" value="${item.total}">
+                <button onclick="hostUpdate('${item.name}')">更新</button>
               </div>
             `
           }
 
           output += `</div>`
-        }
+        })
 
       }
 

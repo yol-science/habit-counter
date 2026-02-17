@@ -175,15 +175,20 @@ def today_total():
     conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
 
-    c.execute("SELECT name, life, total_count FROM habits")
+    c.execute("""
+        SELECT name, life, total_count
+        FROM habits
+        ORDER BY id ASC
+    """)
     rows = c.fetchall()
 
-    result = {}
+    result = []
     for name, life, total in rows:
-        result[name] = {
+        result.append({
+            "name": name,
             "life": life,
             "total": total
-        }
+        })
 
     conn.close()
     return jsonify(result)

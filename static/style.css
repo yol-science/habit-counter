@@ -16,24 +16,6 @@ h1{
   font-weight:600;
 }
 
-.button-group button{
-  padding:12px 20px;
-  margin:10px;
-  font-size:16px;
-  border:none;
-  border-radius:12px;
-  background:#4CAF50;
-  color:white;
-  cursor:pointer;
-  transition:0.2s;
-  box-shadow:0 4px 10px rgba(76,175,80,0.3);
-}
-
-.button-group button:hover{
-  background:#388e3c;
-  transform:translateY(-2px);
-}
-
 .card-area{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
@@ -65,16 +47,96 @@ h1{
   color:#2e7d32;
 }
 
-.host-area{
-  margin: 20px 0;
+/* 🔐 ホストミニUI */
+.host-mini{
+  text-align: right;
+  margin-bottom: 10px;
 }
 
-.host-area input{
-  padding: 8px;
-  border-radius: 8px;
+.host-mini input{
+  width: 140px;
+  padding: 6px;
+  border-radius: 6px;
   border: 1px solid #ccc;
+  font-size: 12px;
 }
 
-.host-area button{
-  padding: 8px 14px;
+.host-mini button{
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  background: #a5d6a7;
+  color: #1b5e20;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.host-mini button:hover{
+  background: #81c784;
+}
+
+/* 🌱 追加カード */
+.add-card{
+  max-width: 400px;
+  margin: 0 auto 30px auto;
+  border-top: 6px solid #81c784;
+}
+
+.add-card h3{
+  margin-top: 0;
+  color:#2e7d32;
+}
+
+.add-card input{
+  width: 100%;
+  padding: 10px;
+  margin: 12px 0;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+.add-card button{
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background: #4CAF50;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.add-card button:hover{
+  background:#388e3c;
+}
+
+/* 🔐 ホストUIを少し洗練 */
+.host-mini{
+  text-align: right;
+  margin-bottom: 15px;
+}
+
+.host-mini input{
+  width: 120px;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  font-size: 12px;
+  background: #f1f8f4;
+}
+
+.host-mini button{
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  background: #c8e6c9;
+  color: #1b5e20;
+  font-size: 12px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.host-mini button:hover{
+  background:#a5d6a7;
 }
