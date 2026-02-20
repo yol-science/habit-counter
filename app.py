@@ -1,10 +1,10 @@
 from flask import Flask, request, jsonify, render_template, session
 import sqlite3
 from datetime import date
-from datetime import datetime
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
-app.secret_key = "super_secret_key"   # ← ここに入れる
+app.secret_key = "super_secret_key"   
 DB_NAME = "counter.db"
 
 # --------------------
@@ -50,7 +50,8 @@ def update_life(habit):
     if last_date:
         last_date_obj = datetime.strptime(last_date, "%Y-%m-%d").date()
         today = datetime.today().date()
-        diff = (today - last_date_obj).days
+        yesterday = today -timedelta(days=1)
+        diff = (yesterday - last_date_obj).days
 
         if diff > 0:
             life -= diff
@@ -172,6 +173,20 @@ def add_count():
 # --------------------
 @app.route("/api/today")
 def today_total():
+    conn = sqlite3.connect(DB_NAME)
+    c = conn.cursor()
+
+    # まず全習慣取得
+    c.execute("SELECT name FROM habits")
+    habit_names = [row[0] for row in c.fetchall()]
+
+    conn.close()
+
+    # 🔥 ここで全習慣のライフ更新
+    for habit in habit_names:
+        update_life(habit)
+
+    # 再取得（更新後）
     conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
 
