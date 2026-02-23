@@ -20,7 +20,8 @@ def init_db():
             name TEXT UNIQUE,
             life INTEGER,
             total_count INTEGER,
-            last_record_date TEXT
+            last_record_date TEXT,
+            last_life_update TEXT
         )
     """)
 
@@ -38,38 +39,44 @@ def update_life(habit):
     conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
 
-    c.execute("SELECT life, total_count, last_record_date FROM habits WHERE name=?", (habit,))
+    c.execute("""
+        SELECT life, total_count, last_record_date, last_life_update
+        FROM habits WHERE name=?
+    """, (habit,))
     row = c.fetchone()
 
     if row is None:
         conn.close()
         return
 
-    life, total_count, last_date = row
+    life, total_count, last_date, last_life_update = row
+    today = datetime.today().date()
+
+    # 今日すでにライフ更新済みなら何もしない
+    if last_life_update == str(today):
+        conn.close()
+        return
 
     if last_date:
         last_date_obj = datetime.strptime(last_date, "%Y-%m-%d").date()
-        today = datetime.today().date()
-        yesterday = today -timedelta(days=1)
-        diff = (yesterday - last_date_obj).days
+        missed_days = (today - last_date_obj).days - 1
 
-        if diff > 0:
-            life -= diff
+        if missed_days > 0:
+            life -= missed_days
 
             if life <= 0:
                 life = 0
                 total_count = 0
 
-            c.execute("""
-                UPDATE habits
-                SET life=?, total_count=?
-                WHERE name=?
-            """, (life, total_count, habit))
+    # 🔥 今日ライフ更新済みにする（ここが重要）
+    c.execute("""
+        UPDATE habits
+        SET life=?, total_count=?, last_life_update=?
+        WHERE name=?
+    """, (life, total_count, str(today), habit))
 
-            conn.commit()
-
+    conn.commit()
     conn.close()
-
 
 # --------------------
 # トップページ
