@@ -78,7 +78,11 @@ function refresh(){
             <h2>${item.name}</h2>
             <div class="life">${heart(item.life)}</div>
             <div class="total">累計: ${item.total}</div>
-            <button onclick="add('${item.name}')">+1</button>
+            <button 
+              onclick="add('${item.name}')"
+              ${item.life <= 0 ? "disabled" : ""}>
+              +1
+            </button>
             <button onclick="deleteHabit('${item.name}')">削除</button>
           `
 
